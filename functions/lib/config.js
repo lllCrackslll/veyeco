@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DEFAULT_DAILY_LOOKBACK_DAYS = exports.DEFAULT_FEED_LOOKBACK_HOURS = exports.DEFAULT_BREAKING_ITEMS = exports.DEFAULT_DAILY_ITEMS = exports.APP_URL = exports.RESEND_FROM = exports.RESEND_API_KEY = exports.LLM_API_KEY = exports.LLM_PROVIDER = exports.STRIPE_PRICE_ID_MONTHLY = exports.STRIPE_WEBHOOK_SECRET = exports.STRIPE_SECRET_KEY = void 0;
+exports.STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || "";
+exports.STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || "";
+exports.STRIPE_PRICE_ID_MONTHLY = process.env.STRIPE_PRICE_ID_MONTHLY || "";
+exports.LLM_PROVIDER = process.env.LLM_PROVIDER || "";
+exports.LLM_API_KEY = process.env.LLM_API_KEY || "";
+exports.RESEND_API_KEY = process.env.RESEND_API_KEY || "";
+exports.RESEND_FROM = process.env.RESEND_FROM || "no-reply@veyeco.ai";
+exports.APP_URL = process.env.APP_URL || "";
+exports.DEFAULT_DAILY_ITEMS = 8;
+exports.DEFAULT_BREAKING_ITEMS = 10;
+exports.DEFAULT_FEED_LOOKBACK_HOURS = 24;
+exports.DEFAULT_DAILY_LOOKBACK_DAYS = 1;
