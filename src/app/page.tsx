@@ -35,18 +35,19 @@ export default function LandingPage() {
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
             <Link
-              href="/app"
+              href="/login"
               className="btn-primary inline-flex items-center gap-2 text-lg"
             >
-              Voir la démo
+              Se connecter
               <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link
-              href="/login"
-              className="btn-secondary inline-flex items-center gap-2 text-lg"
-            >
-              Se connecter
-            </Link>
+          </div>
+
+          <div className="mt-6 text-sm text-gray-400">
+            <p>
+              Sources économiques sélectionnées, résumés clairs, et dashboard optimisé
+              pour charger en 2 lectures max.
+            </p>
           </div>
         </div>
       </section>
