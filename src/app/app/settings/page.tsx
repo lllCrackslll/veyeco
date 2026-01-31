@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Card } from '@/components/Card';
 import { PlanBadge } from '@/components/PlanBadge';
 import { PricingModal } from '@/components/PricingModal';
 import { Save, Check, Crown, Mail, AlertCircle } from 'lucide-react';
 import { useFilters } from '../filters-context';
 import { useAuth } from '@/app/providers';
+import { doc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function SettingsPage() {
   const [countries, setCountries] = useState({
@@ -28,12 +30,61 @@ export default function SettingsPage() {
   const { alertThreshold, setAlertThreshold } = useFilters();
   const [showToast, setShowToast] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const currentPlan = profile?.plan === 'pro' ? 'PRO' : 'FREE';
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSynced, setIsSynced] = useState(false);
 
-  const handleSave = () => {
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
+  const countryKeys = useMemo(() => Object.keys(countries), [countries]);
+  const themeKeys = useMemo(() => Object.keys(themes), [themes]);
+
+  useEffect(() => {
+    if (profile && !isSynced) {
+      const nextCountries = countryKeys.reduce(
+        (acc, code) => ({ ...acc, [code]: profile.countries?.includes(code) ?? false }),
+        {} as Record<string, boolean>
+      );
+      setCountries(nextCountries as typeof countries);
+
+      const nextThemes = themeKeys.reduce(
+        (acc, key) => ({ ...acc, [key]: profile.themes?.includes(key) ?? false }),
+        {} as Record<string, boolean>
+      );
+      setThemes(nextThemes as typeof themes);
+      setAlertThreshold(profile.alertThreshold ?? 70);
+      setIsSynced(true);
+    }
+  }, [countryKeys, themeKeys, profile, isSynced, setAlertThreshold]);
+
+  const handleSave = async () => {
+    if (!user) {
+      setError('Connecte-toi pour enregistrer tes paramètres.');
+      return;
+    }
+    setIsSaving(true);
+    setError(null);
+    try {
+      const selectedCountries = Object.entries(countries)
+        .filter(([, enabled]) => enabled)
+        .map(([code]) => code);
+      const selectedThemes = Object.entries(themes)
+        .filter(([, enabled]) => enabled)
+        .map(([key]) => key);
+
+      await updateDoc(doc(db, 'users', user.uid), {
+        countries: selectedCountries,
+        themes: selectedThemes,
+        alertThreshold,
+        updatedAt: serverTimestamp(),
+      });
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const themeLabels: Record<string, string> = {
@@ -221,25 +272,24 @@ export default function SettingsPage() {
 
       {/* Save Button */}
       <div className="flex items-center gap-4">
-        <button onClick={handleSave} className="btn-primary inline-flex items-center gap-2">
+        <button
+          onClick={handleSave}
+          className="btn-primary inline-flex items-center gap-2"
+          disabled={isSaving}
+        >
           <Save className="w-5 h-5" />
-          Enregistrer les paramètres
+          {isSaving ? 'Enregistrement...' : 'Enregistrer les paramètres'}
         </button>
 
         {showToast && (
           <div className="glass-card px-4 py-2 rounded-lg inline-flex items-center gap-2 text-green-400 animate-fade-in">
             <Check className="w-4 h-4" />
-            <span className="text-sm font-medium">Sauvegardé (mock)</span>
+            <span className="text-sm font-medium">Sauvegardé</span>
           </div>
         )}
       </div>
 
-      {/* Info */}
-      <div className="glass-card rounded-lg p-4">
-        <p className="text-sm text-gray-400 text-center">
-          ℹ️ Les paramètres sont mockés et ne seront pas persistés (mode démo)
-        </p>
-      </div>
+      {error && <p className="text-sm text-red-400">{error}</p>}
 
       {/* Pricing Modal */}
       <PricingModal isOpen={showPricingModal} onClose={() => setShowPricingModal(false)} />
