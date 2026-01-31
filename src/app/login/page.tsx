@@ -3,14 +3,15 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ArrowLeft, Chrome } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { FirebaseError } from 'firebase/app';
 import { useAuth } from '../providers';
+
+export const dynamic = 'force-dynamic';
 
 export default function LoginPage() {
   const { signIn, signUp, signInWithGoogle } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -18,10 +19,13 @@ export default function LoginPage() {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
 
   useEffect(() => {
-    if (searchParams.get('mode') === 'signup') {
-      setMode('signup');
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('mode') === 'signup') {
+        setMode('signup');
+      }
     }
-  }, [searchParams]);
+  }, []);
 
   const handleEmailAuth = async (event: React.FormEvent) => {
     event.preventDefault();
