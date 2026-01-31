@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { X, CreditCard } from 'lucide-react';
+import { useAuth } from '@/app/providers';
 
 interface PricingModalProps {
   isOpen: boolean;
@@ -10,6 +11,45 @@ interface PricingModalProps {
 
 export const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
+  const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleCheckout = async () => {
+    if (!user) {
+      setError("Connecte-toi d'abord pour continuer.");
+      return;
+    }
+    setIsLoading(true);
+    setError(null);
+    try {
+      const token = await user.getIdToken();
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE;
+      if (!apiBase) {
+        throw new Error("API non configurée.");
+      }
+      const response = await fetch(`${apiBase}/createCheckoutSession`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Impossible de créer la session Stripe.");
+      }
+      const data = await response.json();
+      if (data?.url) {
+        window.location.href = data.url;
+        return;
+      }
+      throw new Error("URL Stripe manquante.");
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
@@ -32,10 +72,9 @@ export const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose }) =
 
         {/* Content */}
         <div className="text-center space-y-3">
-          <h3 className="text-2xl font-bold text-white">Paiement bientôt disponible</h3>
+          <h3 className="text-2xl font-bold text-white">Passer en Pro</h3>
           <p className="text-gray-300">
-            L'intégration du système de paiement est en cours de développement. 
-            Vous pourrez bientôt souscrire à l'offre Pro directement depuis cette page.
+            Accès complet au dashboard, breaking alerts et brief quotidien.
           </p>
         </div>
 
@@ -63,11 +102,14 @@ export const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose }) =
         </div>
 
         {/* Button */}
+        {error && <p className="text-xs text-red-400 text-center">{error}</p>}
+
         <button
-          onClick={onClose}
+          onClick={handleCheckout}
           className="w-full btn-primary"
+          disabled={isLoading}
         >
-          J'ai compris
+          {isLoading ? "Redirection..." : "Payer 4,99 €/mois"}
         </button>
       </div>
     </div>

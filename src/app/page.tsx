@@ -49,12 +49,6 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          <div className="mt-6 text-sm text-gray-400">
-            <p>
-              Sources économiques sélectionnées, résumés clairs, et dashboard optimisé
-              pour charger en 2 lectures max.
-            </p>
-          </div>
         </div>
       </section>
 
