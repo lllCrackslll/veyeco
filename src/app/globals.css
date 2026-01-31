@@ -14,9 +14,11 @@
   box-sizing: border-box;
 }
 
+html,
 body {
   @apply bg-gradient-to-br from-[#06162f] via-[#0b1b3a] to-black text-white antialiased;
-  min-height: 100vh;
+  min-height: 100%;
+  background-color: #000000;
 }
 
 /* Scrollbar styling */
