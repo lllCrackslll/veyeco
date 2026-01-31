@@ -9,11 +9,20 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, db, googleProvider } from "@/lib/firebase";
+
+type UserProfile = {
+  email: string;
+  plan: "free" | "pro";
+  countries: string[];
+  themes: string[];
+  alertThreshold: number;
+};
 
 type AuthContextValue = {
   user: User | null;
+  profile: UserProfile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, plan: "free" | "pro") => Promise<void>;
@@ -41,26 +50,42 @@ const ensureUserDoc = async (user: User, plan: "free" | "pro" = "free") => {
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let unsubscribeProfile: (() => void) | undefined;
     const unsubscribe = onAuthStateChanged(auth, async (nextUser) => {
       setUser(nextUser);
       if (nextUser) {
         try {
           await ensureUserDoc(nextUser);
+          const ref = doc(db, "users", nextUser.uid);
+          unsubscribeProfile = onSnapshot(ref, (snap) => {
+            if (snap.exists()) {
+              setProfile(snap.data() as UserProfile);
+            }
+          });
         } catch {
           // On garde l'accès même si l'écriture échoue
         }
+      } else {
+        setProfile(null);
       }
       setLoading(false);
     });
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      if (unsubscribeProfile) {
+        unsubscribeProfile();
+      }
+    };
   }, []);
 
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
+      profile,
       loading,
       signIn: async (email, password) => {
         const credential = await signInWithEmailAndPassword(auth, email, password);
@@ -78,7 +103,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         await signOut(auth);
       },
     }),
-    [user, loading]
+    [user, profile, loading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -6,6 +6,7 @@ import { PlanBadge } from '@/components/PlanBadge';
 import { PricingModal } from '@/components/PricingModal';
 import { Save, Check, Crown, Mail, AlertCircle } from 'lucide-react';
 import { useFilters } from '../filters-context';
+import { useAuth } from '@/app/providers';
 
 export default function SettingsPage() {
   const [countries, setCountries] = useState({
@@ -27,7 +28,8 @@ export default function SettingsPage() {
   const { alertThreshold, setAlertThreshold } = useFilters();
   const [showToast, setShowToast] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
-  const [currentPlan] = useState<'FREE' | 'PRO'>('FREE'); // Mock: toujours FREE
+  const { profile } = useAuth();
+  const currentPlan = profile?.plan === 'pro' ? 'PRO' : 'FREE';
 
   const handleSave = () => {
     setShowToast(true);
