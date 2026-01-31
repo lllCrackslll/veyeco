@@ -36,9 +36,15 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
             <Link
               href="/login"
-              className="btn-primary inline-flex items-center gap-2 text-lg"
+              className="btn-secondary inline-flex items-center gap-2 text-lg"
             >
               Se connecter
+            </Link>
+            <Link
+              href="/login"
+              className="btn-primary inline-flex items-center gap-2 text-lg"
+            >
+              Essayer gratuitement
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -114,7 +120,7 @@ export default function LandingPage() {
             <span className="text-lg font-bold text-white">Veyeco</span>
           </div>
           <p className="text-sm text-gray-400">
-            © 2024 Veyeco. Veille économique intelligente.
+            © 2026 Veyeco. Veille économique intelligente.
           </p>
         </div>
       </footer>

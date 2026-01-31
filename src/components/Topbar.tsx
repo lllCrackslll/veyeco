@@ -70,13 +70,21 @@ export const Topbar: React.FC<TopbarProps> = ({
                 </button>
               </div>
             ) : (
-              <Link
-                href="/login"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
-              >
-                <User className="w-4 h-4" />
-                <span className="text-sm font-medium">Connexion</span>
-              </Link>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/login"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+                >
+                  <User className="w-4 h-4" />
+                  <span className="text-sm font-medium">Connexion</span>
+                </Link>
+                <Link
+                  href="/login"
+                  className="px-4 py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-white text-sm font-medium transition-all"
+                >
+                  S’inscrire
+                </Link>
+              </div>
             )}
           </div>
         </div>

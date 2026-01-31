@@ -69,10 +69,10 @@ export const LandingNavbar: React.FC = () => {
               Se connecter
             </Link>
             <Link
-              href="/app"
+              href="/login"
               className="px-5 py-2 bg-sky-500 hover:bg-sky-400 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-sky-500/20"
             >
-              Voir la démo
+              Essayer gratuitement
             </Link>
           </div>
 
@@ -113,10 +113,10 @@ export const LandingNavbar: React.FC = () => {
                 Se connecter
               </Link>
               <Link
-                href="/app"
+                href="/login"
                 className="block px-4 py-2 text-center bg-sky-500 hover:bg-sky-400 text-white font-medium rounded-lg transition-all"
               >
-                Voir la démo
+                Essayer gratuitement
               </Link>
             </div>
           </div>

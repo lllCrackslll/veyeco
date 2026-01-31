@@ -14,27 +14,23 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [selectedPlan, setSelectedPlan] = useState<'free' | 'pro'>('free');
 
   const handleEmailAuth = async (event: React.FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
     try {
-      await signIn(email, password);
+      if (mode === 'signup') {
+        await signUp(email, password, selectedPlan);
+      } else {
+        await signIn(email, password);
+      }
       router.push('/app');
     } catch (err) {
       const firebaseError = err as FirebaseError;
-      if (firebaseError.code === 'auth/user-not-found') {
-        try {
-          await signUp(email, password);
-          router.push('/app');
-          return;
-        } catch (signupError) {
-          setError((signupError as FirebaseError).message);
-        }
-      } else {
-        setError(firebaseError.message);
-      }
+      setError(firebaseError.message);
     } finally {
       setIsLoading(false);
     }
@@ -44,7 +40,7 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
     try {
-      await signInWithGoogle();
+      await signInWithGoogle(mode === 'signup' ? selectedPlan : 'free');
       router.push('/app');
     } catch (err) {
       setError((err as FirebaseError).message);
@@ -75,6 +71,78 @@ export default function LoginPage() {
             <h1 className="text-3xl font-bold text-white">Connexion</h1>
             <p className="text-gray-400">Accédez à votre veille économique</p>
           </div>
+
+          {/* Mode Switch */}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setMode('login')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                mode === 'login'
+                  ? 'bg-sky-500 text-white'
+                  : 'bg-white/5 text-gray-300 hover:bg-white/10'
+              }`}
+            >
+              Connexion
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode('signup')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                mode === 'signup'
+                  ? 'bg-sky-500 text-white'
+                  : 'bg-white/5 text-gray-300 hover:bg-white/10'
+              }`}
+            >
+              Inscription
+            </button>
+          </div>
+
+          {/* Plan */}
+          {mode === 'signup' && (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-300">Choisir un plan</p>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedPlan('free')}
+                  className={`rounded-lg border px-4 py-3 text-left text-sm transition-all ${
+                    selectedPlan === 'free'
+                      ? 'border-sky-500 bg-sky-500/10 text-white'
+                      : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'
+                  }`}
+                >
+                  <p className="font-medium">Gratuit</p>
+                  <p className="text-xs text-gray-400">0 € / mois</p>
+                  <ul className="mt-2 space-y-1 text-xs text-gray-400">
+                    <li>• 1 email / semaine</li>
+                    <li>• Brief du jour</li>
+                    <li>• France uniquement</li>
+                  </ul>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedPlan('pro')}
+                  className={`rounded-lg border px-4 py-3 text-left text-sm transition-all ${
+                    selectedPlan === 'pro'
+                      ? 'border-sky-500 bg-sky-500/10 text-white'
+                      : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'
+                  }`}
+                >
+                  <p className="font-medium">Pro</p>
+                  <p className="text-xs text-gray-400">4,99 € / mois</p>
+                  <ul className="mt-2 space-y-1 text-xs text-gray-400">
+                    <li>• Brief quotidien</li>
+                    <li>• Breaking alerts</li>
+                    <li>• FR / EU / US</li>
+                  </ul>
+                </button>
+              </div>
+              <p className="text-xs text-gray-500">
+                Le plan Pro nécessite un paiement, vous pourrez l'activer ensuite.
+              </p>
+            </div>
+          )}
 
           {/* Form */}
           <form className="space-y-4" onSubmit={handleEmailAuth}>
@@ -116,7 +184,11 @@ export default function LoginPage() {
               className="w-full btn-primary"
               disabled={isLoading}
             >
-              {isLoading ? 'Connexion...' : 'Continuer'}
+              {isLoading
+                ? 'Chargement...'
+                : mode === 'signup'
+                  ? 'Créer un compte'
+                  : 'Continuer'}
             </button>
           </form>
 
@@ -127,7 +199,7 @@ export default function LoginPage() {
             disabled={isLoading}
           >
             <Chrome className="w-4 h-4" />
-            Continuer avec Google
+            {mode === 'signup' ? 'Créer avec Google' : 'Continuer avec Google'}
           </button>
 
           {error && (
@@ -137,14 +209,11 @@ export default function LoginPage() {
           )}
         </div>
 
-        {/* Demo Link */}
+        {/* Footer */}
         <div className="text-center">
-          <Link
-            href="/app"
-            className="text-sm text-sky-400 hover:text-sky-300 transition-colors"
-          >
-            Voir la démo sans connexion →
-          </Link>
+          <p className="text-xs text-gray-400">
+            En vous connectant, vous accédez au dashboard complet.
+          </p>
         </div>
       </div>
     </div>

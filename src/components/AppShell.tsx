@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Topbar } from './Topbar';
 import { TopTabs } from './TopTabs';
 import Link from 'next/link';
 import { useAuth } from '@/app/providers';
+import { useRouter } from 'next/navigation';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -22,6 +23,13 @@ export const AppShell: React.FC<AppShellProps> = ({
   onCountryChange,
 }) => {
   const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace('/login');
+    }
+  }, [loading, router, user]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -37,21 +45,21 @@ export const AppShell: React.FC<AppShellProps> = ({
 
       {/* Main Content */}
       <main className="flex-1 max-w-[1600px] mx-auto px-6 py-8 w-full relative">
-        {children}
-        {!loading && !user && (
-          <div className="fixed bottom-6 right-6 z-40 max-w-sm glass-card rounded-xl p-4 border border-sky-500/30">
-            <p className="text-sm text-white font-medium">Connecte-toi pour personnaliser ta veille</p>
-            <p className="text-xs text-gray-400 mt-1">
-              Accès complet, filtres sauvegardés et emails hebdo.
+        {loading ? (
+          <div className="min-h-[40vh] flex items-center justify-center text-sm text-gray-400">
+            Chargement...
+          </div>
+        ) : user ? (
+          children
+        ) : (
+          <div className="min-h-[40vh] flex flex-col items-center justify-center text-center gap-4">
+            <p className="text-white font-medium">Connexion requise</p>
+            <p className="text-sm text-gray-400">
+              Connecte-toi pour accéder au dashboard.
             </p>
-            <div className="mt-3 flex gap-2">
-              <Link href="/login" className="btn-primary px-4 py-2 text-sm">
-                Se connecter
-              </Link>
-              <Link href="/login" className="btn-secondary px-4 py-2 text-sm">
-                Créer un compte
-              </Link>
-            </div>
+            <Link href="/login" className="btn-primary px-4 py-2 text-sm">
+              Se connecter
+            </Link>
           </div>
         )}
       </main>

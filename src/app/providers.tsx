@@ -16,21 +16,21 @@ type AuthContextValue = {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
+  signUp: (email: string, password: string, plan: "free" | "pro") => Promise<void>;
+  signInWithGoogle: (plan?: "free" | "pro") => Promise<void>;
   signOutUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const ensureUserDoc = async (user: User) => {
+const ensureUserDoc = async (user: User, plan: "free" | "pro" = "free") => {
   const ref = doc(db, "users", user.uid);
   const snapshot = await getDoc(ref);
   if (snapshot.exists()) return;
 
   await setDoc(ref, {
     email: user.email || "",
-    plan: "free",
+    plan,
     countries: ["FR", "EU"],
     themes: [],
     alertThreshold: 70,
@@ -66,13 +66,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const credential = await signInWithEmailAndPassword(auth, email, password);
         await ensureUserDoc(credential.user);
       },
-      signUp: async (email, password) => {
+      signUp: async (email, password, plan) => {
         const credential = await createUserWithEmailAndPassword(auth, email, password);
-        await ensureUserDoc(credential.user);
+        await ensureUserDoc(credential.user, plan);
       },
-      signInWithGoogle: async () => {
+      signInWithGoogle: async (plan = "free") => {
         const credential = await signInWithPopup(auth, googleProvider);
-        await ensureUserDoc(credential.user);
+        await ensureUserDoc(credential.user, plan);
       },
       signOutUser: async () => {
         await signOut(auth);
