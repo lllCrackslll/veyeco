@@ -49,8 +49,8 @@ exports.createCheckoutSession = (0, https_1.onRequest)(async (req, res) => {
             mode: "subscription",
             payment_method_types: ["card"],
             line_items: [{ price: config_1.STRIPE_PRICE_ID_MONTHLY, quantity: 1 }],
-            success_url: `${config_1.APP_URL}/app?checkout=success`,
-            cancel_url: `${config_1.APP_URL}/app?checkout=cancel`,
+            success_url: `${config_1.APP_URL}/dashboard?checkout=success`,
+            cancel_url: `${config_1.APP_URL}/dashboard?checkout=cancel`,
             metadata: { uid },
             client_reference_id: uid,
         });
