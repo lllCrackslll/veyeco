@@ -35,11 +35,8 @@ export const LandingNavbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-sky-400 to-blue-600 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-white group-hover:text-sky-400 transition-colors">
+          <Link href="/" className="flex items-center gap-3 group">
+            <span className="text-xl md:text-2xl font-semibold text-white group-hover:text-sky-300 transition-colors font-display">
               Veyeco
             </span>
           </Link>
@@ -69,7 +66,7 @@ export const LandingNavbar: React.FC = () => {
               Se connecter
             </Link>
             <Link
-              href="/login"
+              href="/login?mode=signup"
               className="px-5 py-2 bg-sky-500 hover:bg-sky-400 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-sky-500/20"
             >
               Essayer gratuitement
@@ -113,7 +110,7 @@ export const LandingNavbar: React.FC = () => {
                 Se connecter
               </Link>
               <Link
-                href="/login"
+                href="/login?mode=signup"
                 className="block px-4 py-2 text-center bg-sky-500 hover:bg-sky-400 text-white font-medium rounded-lg transition-all"
               >
                 Essayer gratuitement

@@ -12,9 +12,9 @@ export const Badge: React.FC<BadgeProps> = ({
   className = '' 
 }) => {
   const variants = {
-    default: 'bg-white/10 text-gray-300',
-    primary: 'bg-sky-500/20 text-sky-300 border border-sky-500/30',
-    secondary: 'bg-purple-500/20 text-purple-300 border border-purple-500/30',
+    default: 'bg-white/[0.06] text-gray-300 border border-white/10',
+    primary: 'bg-sky-500/15 text-sky-200 border border-sky-500/30',
+    secondary: 'bg-purple-500/15 text-purple-200 border border-purple-500/30',
   };
 
   return (

@@ -54,11 +54,12 @@ exports.sendWeeklyEmail = (0, scheduler_1.onSchedule)("every monday 09:00", asyn
     });
     for (const userDoc of usersSnapshot.docs) {
         const user = userDoc.data();
-        if (!user.email || !user.countries?.length) {
+        if (!user.email) {
             continue;
         }
+        const countries = ["FR"];
         const feedRefs = [];
-        for (const country of user.countries) {
+        for (const country of countries) {
             for (const day of days) {
                 feedRefs.push(db.collection("public_feeds").doc(`daily_${day}_${country}`));
             }

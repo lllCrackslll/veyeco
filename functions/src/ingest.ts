@@ -1,11 +1,7 @@
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { logger } from "firebase-functions";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
-import {
-  DEFAULT_BREAKING_ITEMS,
-  DEFAULT_DAILY_ITEMS,
-  DEFAULT_FEED_LOOKBACK_HOURS,
-} from "./config";
+import { DEFAULT_DAILY_ITEMS } from "./config";
 import { buildFeedItem } from "./feeds";
 import { generateInsight } from "./llm";
 import { ArticleDoc, InsightDoc, SourceDoc } from "./models";
@@ -86,8 +82,6 @@ const rebuildFeedsForCountry = async (
   const dateId = asDateStringUTC(now);
   const dayStart = startOfDayUTC(now);
   const dayEnd = endOfDayUTC(now);
-  const breakingStart = new Date(now.getTime() - DEFAULT_FEED_LOOKBACK_HOURS * 60 * 60 * 1000);
-
   const dailySnapshot = await db
     .collection("articles")
     .where("country", "==", country)
@@ -95,14 +89,6 @@ const rebuildFeedsForCountry = async (
     .where("publishedAt", "<", Timestamp.fromDate(dayEnd))
     .orderBy("publishedAt", "desc")
     .limit(80)
-    .get();
-
-  const breakingSnapshot = await db
-    .collection("articles")
-    .where("country", "==", country)
-    .where("publishedAt", ">=", Timestamp.fromDate(breakingStart))
-    .orderBy("publishedAt", "desc")
-    .limit(60)
     .get();
 
   const collectItems = async (snapshot: FirebaseFirestore.QuerySnapshot) => {
@@ -144,18 +130,11 @@ const rebuildFeedsForCountry = async (
   };
 
   const dailyItems = await collectItems(dailySnapshot);
-  const breakingItems = await collectItems(breakingSnapshot);
 
-  const sortByImportance = (items: ReturnType<typeof buildFeedItem>[]) =>
-    items.sort((a, b) => {
-      if (b.importanceScore !== a.importanceScore) {
-        return b.importanceScore - a.importanceScore;
-      }
-      return b.publishedAt.localeCompare(a.publishedAt);
-    });
+  const sortByRecency = (items: ReturnType<typeof buildFeedItem>[]) =>
+    items.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 
-  const dailySorted = sortByImportance(dailyItems).slice(0, DEFAULT_DAILY_ITEMS);
-  const breakingSorted = sortByImportance(breakingItems).slice(0, DEFAULT_BREAKING_ITEMS);
+  const dailySorted = sortByRecency(dailyItems).slice(0, DEFAULT_DAILY_ITEMS);
 
   await db.collection("public_feeds").doc(`daily_${dateId}_${country}`).set(
     {
@@ -163,16 +142,6 @@ const rebuildFeedsForCountry = async (
       country,
       date: dateId,
       items: dailySorted,
-      updatedAt: serverTimestamp(),
-    },
-    { merge: true }
-  );
-
-  await db.collection("public_feeds").doc(`breaking_latest_${country}`).set(
-    {
-      feedType: "breaking",
-      country,
-      items: breakingSorted,
       updatedAt: serverTimestamp(),
     },
     { merge: true }

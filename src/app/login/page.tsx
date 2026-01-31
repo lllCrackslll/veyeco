@@ -1,21 +1,27 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
-import { ArrowLeft, Chrome, TrendingUp } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { ArrowLeft, Chrome } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { FirebaseError } from 'firebase/app';
 import { useAuth } from '../providers';
 
 export default function LoginPage() {
   const { signIn, signUp, signInWithGoogle } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<'login' | 'signup'>('login');
-  const [selectedPlan, setSelectedPlan] = useState<'free' | 'pro'>('free');
+
+  useEffect(() => {
+    if (searchParams.get('mode') === 'signup') {
+      setMode('signup');
+    }
+  }, [searchParams]);
 
   const handleEmailAuth = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -23,11 +29,11 @@ export default function LoginPage() {
     setError(null);
     try {
       if (mode === 'signup') {
-        await signUp(email, password, selectedPlan);
+        await signUp(email, password, 'free');
       } else {
         await signIn(email, password);
       }
-      router.push('/app');
+      router.push('/dashboard/choose-plan');
     } catch (err) {
       const firebaseError = err as FirebaseError;
       setError(firebaseError.message);
@@ -40,8 +46,8 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
     try {
-      await signInWithGoogle(mode === 'signup' ? selectedPlan : 'free');
-      router.push('/app');
+      await signInWithGoogle('free');
+      router.push('/dashboard/choose-plan');
     } catch (err) {
       setError((err as FirebaseError).message);
     } finally {
@@ -65,9 +71,6 @@ export default function LoginPage() {
         <div className="glass-card rounded-2xl p-8 space-y-6">
           {/* Header */}
           <div className="text-center space-y-2">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-sky-400 to-blue-600 rounded-2xl mb-4">
-              <TrendingUp className="w-7 h-7 text-white" />
-            </div>
             <h1 className="text-3xl font-bold text-white">Connexion</h1>
             <p className="text-gray-400">Accédez à votre veille économique</p>
           </div>
@@ -97,52 +100,6 @@ export default function LoginPage() {
               Inscription
             </button>
           </div>
-
-          {/* Plan */}
-          {mode === 'signup' && (
-            <div className="space-y-4">
-              <p className="text-sm text-gray-300">Choisir un plan</p>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSelectedPlan('free')}
-                  className={`rounded-lg border px-4 py-3 text-left text-sm transition-all ${
-                    selectedPlan === 'free'
-                      ? 'border-sky-500 bg-sky-500/10 text-white'
-                      : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'
-                  }`}
-                >
-                  <p className="font-medium">Gratuit</p>
-                  <p className="text-xs text-gray-400">0 € / mois</p>
-                  <ul className="mt-2 space-y-1 text-xs text-gray-400">
-                    <li>• 1 email / semaine</li>
-                    <li>• Brief du jour</li>
-                    <li>• France uniquement</li>
-                  </ul>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedPlan('pro')}
-                  className={`rounded-lg border px-4 py-3 text-left text-sm transition-all ${
-                    selectedPlan === 'pro'
-                      ? 'border-sky-500 bg-sky-500/10 text-white'
-                      : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'
-                  }`}
-                >
-                  <p className="font-medium">Pro</p>
-                  <p className="text-xs text-gray-400">4,99 € / mois</p>
-                  <ul className="mt-2 space-y-1 text-xs text-gray-400">
-                    <li>• Brief quotidien</li>
-                    <li>• Breaking alerts</li>
-                    <li>• FR / EU / US</li>
-                  </ul>
-                </button>
-              </div>
-              <p className="text-xs text-gray-500">
-                Le plan Pro nécessite un paiement, vous pourrez l'activer ensuite.
-              </p>
-            </div>
-          )}
 
           {/* Form */}
           <form className="space-y-4" onSubmit={handleEmailAuth}>

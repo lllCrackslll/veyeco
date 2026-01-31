@@ -23,15 +23,11 @@ exports.feed = (0, https_1.onRequest)(async (req, res) => {
     const country = countryRaw.toUpperCase();
     const date = (0, utils_1.asDateStringUTC)(new Date());
     const dailyId = `daily_${date}_${country}`;
-    const breakingId = `breaking_latest_${country}`;
     const db = (0, firestore_1.getFirestore)();
     const dailyRef = db.collection("public_feeds").doc(dailyId);
-    const breakingRef = db.collection("public_feeds").doc(breakingId);
-    const [dailySnap, breakingSnap] = await db.getAll(dailyRef, breakingRef);
+    const [dailySnap] = await db.getAll(dailyRef);
     const daily = dailySnap.exists ? dailySnap.data() : null;
-    const breaking = breakingSnap.exists ? breakingSnap.data() : null;
     res.status(200).json({
         daily,
-        breaking,
     });
 });

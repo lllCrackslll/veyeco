@@ -32,7 +32,6 @@ export const PricingSection: React.FC = () => {
       badge: 'Recommandé',
       features: [
         'Brief quotidien par email',
-        'Breaking alerts en temps réel',
         'Tous pays (FR, EU, US)',
         'Toutes les thématiques',
         'Filtres avancés',
@@ -50,7 +49,7 @@ export const PricingSection: React.FC = () => {
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16 space-y-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-white">
+            <h2 className="text-3xl md:text-4xl font-semibold text-white font-display tracking-tight">
               Tarifs simples et transparents
             </h2>
             <p className="text-lg text-gray-300 max-w-2xl mx-auto">
@@ -64,9 +63,9 @@ export const PricingSection: React.FC = () => {
             {plans.map((plan) => (
               <div
                 key={plan.name}
-                className={`glass-card rounded-2xl p-8 space-y-6 transition-all duration-300 hover:scale-105 ${
+                className={`glass-card rounded-2xl p-8 space-y-6 transition-all duration-300 hover:-translate-y-1 ${
                   plan.highlighted
-                    ? 'border-2 border-sky-500/50 shadow-xl shadow-sky-500/10'
+                    ? 'border-2 border-sky-500/50 shadow-xl shadow-sky-500/20'
                     : ''
                 }`}
               >
@@ -82,7 +81,7 @@ export const PricingSection: React.FC = () => {
 
                 {/* Header */}
                 <div className="text-center space-y-2">
-                  <h3 className="text-2xl font-bold text-white">{plan.name}</h3>
+                  <h3 className="text-2xl font-semibold text-white font-display">{plan.name}</h3>
                   <p className="text-sm text-gray-400">{plan.description}</p>
                 </div>
 

@@ -10,30 +10,27 @@ export default function LandingPage() {
       <LandingNavbar />
 
       {/* Hero Section */}
-      <section className="flex-1 flex flex-col items-center justify-center px-6 py-20 text-center pt-32">
-        <div className="max-w-4xl mx-auto space-y-8">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-300 text-sm">
-            <Zap className="w-4 h-4" />
-            <span>Veille économique nouvelle génération</span>
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 text-center pt-32 pb-16 overflow-hidden">
+        <div className="absolute -top-24 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-sky-500/20 blur-3xl" />
+        <div className="absolute -bottom-32 right-[-80px] h-[320px] w-[320px] rounded-full bg-blue-500/10 blur-3xl" />
+
+        <div className="relative max-w-4xl mx-auto space-y-10">
+          {/* Title */}
+          <div className="space-y-4">
+            <h1 className="text-5xl md:text-7xl font-semibold text-white leading-tight tracking-tight font-display">
+              La veille macro
+              <br />
+              <span className="bg-gradient-to-r from-sky-300 via-sky-400 to-blue-500 bg-clip-text text-transparent">
+                l’essentiel chaque jour
+              </span>
+            </h1>
+            <p className="text-base md:text-xl text-gray-300 max-w-2xl mx-auto">
+              Toutes les grandes décisions macro, résumées et priorisées pour une lecture rapide et utile.
+            </p>
           </div>
 
-          {/* Title */}
-          <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight">
-            Veille économique<br />
-            <span className="bg-gradient-to-r from-sky-400 to-blue-600 bg-clip-text text-transparent">
-              l'essentiel sans le bruit
-            </span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto">
-            Brief quotidien + breaking alerts sur le budget, la fiscalité, 
-            les banques centrales et la macro-économie.
-          </p>
-
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/login"
               className="btn-secondary inline-flex items-center gap-2 text-lg"
@@ -41,7 +38,7 @@ export default function LandingPage() {
               Se connecter
             </Link>
             <Link
-              href="/login"
+              href="/login?mode=signup"
               className="btn-primary inline-flex items-center gap-2 text-lg"
             >
               Essayer gratuitement
@@ -55,7 +52,7 @@ export default function LandingPage() {
       {/* Features Section */}
       <section id="features" className="px-6 py-20 border-t border-white/10 scroll-mt-20">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-16">
+          <h2 className="text-3xl md:text-4xl font-semibold text-center text-white mb-16 font-display tracking-tight">
             Une veille qui s'adapte à vos besoins
           </h2>
 
@@ -77,10 +74,10 @@ export default function LandingPage() {
               <div className="w-12 h-12 bg-gradient-to-br from-red-400 to-orange-600 rounded-xl flex items-center justify-center">
                 <Zap className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-white">Breaking Alerts</h3>
+              <h3 className="text-xl font-bold text-white">Priorisation intelligente</h3>
               <p className="text-gray-300">
-                Soyez alerté en temps réel des événements majeurs : décisions 
-                BCE/Fed, budgets, réformes fiscales, chocs macro.
+                Les informations clés sont triées et résumées pour une lecture rapide,
+                sans surcharge.
               </p>
             </div>
 
@@ -107,11 +104,8 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-white/10 px-6 py-8">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-sky-400 to-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold">M</span>
-            </div>
-            <span className="text-lg font-bold text-white">Veyeco</span>
+          <div className="flex items-center gap-3">
+            <span className="text-lg font-semibold text-white font-display">Veyeco</span>
           </div>
           <p className="text-sm text-gray-400">
             © 2026 Veyeco. Veille économique intelligente.

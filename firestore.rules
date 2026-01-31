@@ -29,5 +29,14 @@ service cloud.firestore {
       allow read: if false;
       allow write: if false;
     }
+
+    match /feedbacks/{feedbackId} {
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.message is string
+        && request.resource.data.message.size() > 0
+        && request.resource.data.createdAt == request.time;
+      allow read, update, delete: if false;
+    }
   }
 }

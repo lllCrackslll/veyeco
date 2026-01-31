@@ -58,7 +58,6 @@ const rebuildFeedsForCountry = async (country, sourceMap) => {
     const dateId = (0, utils_1.asDateStringUTC)(now);
     const dayStart = (0, utils_1.startOfDayUTC)(now);
     const dayEnd = (0, utils_1.endOfDayUTC)(now);
-    const breakingStart = new Date(now.getTime() - config_1.DEFAULT_FEED_LOOKBACK_HOURS * 60 * 60 * 1000);
     const dailySnapshot = await db
         .collection("articles")
         .where("country", "==", country)
@@ -66,13 +65,6 @@ const rebuildFeedsForCountry = async (country, sourceMap) => {
         .where("publishedAt", "<", firestore_1.Timestamp.fromDate(dayEnd))
         .orderBy("publishedAt", "desc")
         .limit(80)
-        .get();
-    const breakingSnapshot = await db
-        .collection("articles")
-        .where("country", "==", country)
-        .where("publishedAt", ">=", firestore_1.Timestamp.fromDate(breakingStart))
-        .orderBy("publishedAt", "desc")
-        .limit(60)
         .get();
     const collectItems = async (snapshot) => {
         if (snapshot.empty)
@@ -106,26 +98,13 @@ const rebuildFeedsForCountry = async (country, sourceMap) => {
             .filter(Boolean);
     };
     const dailyItems = await collectItems(dailySnapshot);
-    const breakingItems = await collectItems(breakingSnapshot);
-    const sortByImportance = (items) => items.sort((a, b) => {
-        if (b.importanceScore !== a.importanceScore) {
-            return b.importanceScore - a.importanceScore;
-        }
-        return b.publishedAt.localeCompare(a.publishedAt);
-    });
-    const dailySorted = sortByImportance(dailyItems).slice(0, config_1.DEFAULT_DAILY_ITEMS);
-    const breakingSorted = sortByImportance(breakingItems).slice(0, config_1.DEFAULT_BREAKING_ITEMS);
+    const sortByRecency = (items) => items.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+    const dailySorted = sortByRecency(dailyItems).slice(0, config_1.DEFAULT_DAILY_ITEMS);
     await db.collection("public_feeds").doc(`daily_${dateId}_${country}`).set({
         feedType: "daily",
         country,
         date: dateId,
         items: dailySorted,
-        updatedAt: (0, utils_1.serverTimestamp)(),
-    }, { merge: true });
-    await db.collection("public_feeds").doc(`breaking_latest_${country}`).set({
-        feedType: "breaking",
-        country,
-        items: breakingSorted,
         updatedAt: (0, utils_1.serverTimestamp)(),
     }, { merge: true });
 };

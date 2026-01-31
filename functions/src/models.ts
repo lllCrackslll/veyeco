@@ -48,9 +48,6 @@ export interface PublicFeedDoc {
 export interface UserDoc {
   email: string;
   plan: "free" | "pro";
-  countries: CountryCode[];
-  themes: string[];
-  alertThreshold: number;
   createdAt: FirebaseFirestore.FieldValue | FirebaseFirestore.Timestamp;
   updatedAt: FirebaseFirestore.FieldValue | FirebaseFirestore.Timestamp;
 }
