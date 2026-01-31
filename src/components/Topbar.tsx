@@ -4,7 +4,8 @@ import React from 'react';
 import Link from 'next/link';
 import { SearchInput } from './SearchInput';
 import { CountryFilter } from './CountryFilter';
-import { User, TrendingUp } from 'lucide-react';
+import { LogOut, User, TrendingUp } from 'lucide-react';
+import { useAuth } from '@/app/providers';
 
 interface TopbarProps {
   searchQuery: string;
@@ -19,6 +20,8 @@ export const Topbar: React.FC<TopbarProps> = ({
   selectedCountry,
   onCountryChange,
 }) => {
+  const { user, signOutUser } = useAuth();
+
   return (
     <div className="sticky top-0 z-50 bg-gradient-to-r from-[#06162f]/95 via-[#0b1b3a]/95 to-black/95 backdrop-blur-xl border-b border-white/10">
       <div className="max-w-[1600px] mx-auto px-6 py-4">
@@ -50,13 +53,31 @@ export const Topbar: React.FC<TopbarProps> = ({
 
           {/* User Menu */}
           <div className="flex items-center gap-4">
-            <Link
-              href="/login"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
-            >
-              <User className="w-4 h-4" />
-              <span className="text-sm font-medium">Connexion</span>
-            </Link>
+            {user ? (
+              <div className="flex items-center gap-3">
+                <div className="hidden md:flex flex-col items-end">
+                  <span className="text-xs text-gray-400">Connecté</span>
+                  <span className="text-sm text-white truncate max-w-[160px]">
+                    {user.email || 'Utilisateur'}
+                  </span>
+                </div>
+                <button
+                  onClick={() => signOutUser()}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="text-sm font-medium">Déconnexion</span>
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+              >
+                <User className="w-4 h-4" />
+                <span className="text-sm font-medium">Connexion</span>
+              </Link>
+            )}
           </div>
         </div>
       </div>
